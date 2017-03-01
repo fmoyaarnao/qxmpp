@@ -821,7 +821,7 @@ QMap<QByteArray, QByteArray> QXmppSaslDigestMd5::parseMessage(const QByteArray &
 QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArray> &map)
 {
     QByteArray ba;
-    foreach (const QByteArray &key, map.keys())
+    Q_FOREACH (const QByteArray &key, map.keys())
     {
         if (!ba.isEmpty())
             ba.append(',');

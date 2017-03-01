@@ -29,7 +29,7 @@ class tst_QXmppIceConnection : public QObject
 {
     Q_OBJECT
 
-private slots:
+private Q_SLOTS:
     void testBind();
     void testBindStun();
     void testConnect();
@@ -56,7 +56,7 @@ void tst_QXmppIceConnection::testBind()
     QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
-    foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
+    Q_FOREACH (const QXmppJingleCandidate &c, client.localCandidates()) {
         QCOMPARE(c.component(), componentId);
         QCOMPARE(c.type(), QXmppJingleCandidate::HostType);
     }
@@ -95,7 +95,7 @@ void tst_QXmppIceConnection::testBindStun()
     QCOMPARE(client.gatheringState(), QXmppIceConnection::CompleteGatheringState);
     QCOMPARE(client.localCandidates().size(), component->localCandidates().size());
     QVERIFY(!client.localCandidates().isEmpty());
-    foreach (const QXmppJingleCandidate &c, client.localCandidates()) {
+    Q_FOREACH (const QXmppJingleCandidate &c, client.localCandidates()) {
         QCOMPARE(c.component(), componentId);
         if (c.type() == QXmppJingleCandidate::ServerReflexiveType)
             foundReflexive = true;
@@ -133,9 +133,9 @@ void tst_QXmppIceConnection::testConnect()
     clientR.setRemotePassword(clientL.localPassword());
 
     // exchange candidates
-    foreach (const QXmppJingleCandidate &candidate, clientR.localCandidates())
+    Q_FOREACH (const QXmppJingleCandidate &candidate, clientR.localCandidates())
         clientL.addRemoteCandidate(candidate);
-    foreach (const QXmppJingleCandidate &candidate, clientL.localCandidates())
+    Q_FOREACH (const QXmppJingleCandidate &candidate, clientL.localCandidates())
         clientR.addRemoteCandidate(candidate);
 
     // start ICE

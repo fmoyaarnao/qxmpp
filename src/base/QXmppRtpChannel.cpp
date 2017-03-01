@@ -66,7 +66,7 @@ void QXmppRtpChannel::setRemotePayloadTypes(const QList<QXmppJinglePayloadType> 
     QList<QXmppJinglePayloadType> commonOutgoingTypes;
     QList<QXmppJinglePayloadType> commonIncomingTypes;
 
-    foreach (const QXmppJinglePayloadType &incomingType, remotePayloadTypes) {
+    Q_FOREACH (const QXmppJinglePayloadType &incomingType, remotePayloadTypes) {
         // check we support this payload type
         int outgoingIndex = m_outgoingPayloadTypes.indexOf(incomingType);
         if (outgoingIndex < 0)
@@ -303,7 +303,7 @@ QXmppRtpAudioChannel::QXmppRtpAudioChannel(QObject *parent)
 
 QXmppRtpAudioChannel::~QXmppRtpAudioChannel()
 {
-    foreach (QXmppCodec *codec, d->incomingCodecs)
+    Q_FOREACH (QXmppCodec *codec, d->incomingCodecs)
         delete codec;
     if (d->outgoingCodec)
         delete d->outgoingCodec;
@@ -352,7 +352,7 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     QXmppCodec *codec = 0;
     const quint8 packetType = packet.type();
     if (!d->incomingCodecs.contains(packetType)) {
-        foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
+        Q_FOREACH (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
             if (packetType == payload.id()) {
                 codec = d->codecForPayloadType(payload);
                 break;
@@ -413,12 +413,12 @@ void QXmppRtpAudioChannel::datagramReceived(const QByteArray &ba)
     if (d->incomingBuffer.size() >= d->incomingMinimum)
         d->incomingBuffering = false;
     if (!d->incomingBuffering)
-        emit readyRead();
+        Q_EMIT readyRead();
 }
 
 void QXmppRtpAudioChannel::emitSignals()
 {
-    emit bytesWritten(d->writtenSinceLastEmit);
+    Q_EMIT bytesWritten(d->writtenSinceLastEmit);
     d->writtenSinceLastEmit = 0;
     d->signalsEmitted = false;
 }
@@ -490,7 +490,7 @@ qint64 QXmppRtpAudioChannel::readData(char * data, qint64 maxSize)
 void QXmppRtpAudioChannel::payloadTypesChanged()
 {
     // delete incoming codecs
-    foreach (QXmppCodec *codec, d->incomingCodecs)
+    Q_FOREACH (QXmppCodec *codec, d->incomingCodecs)
         delete codec;
     d->incomingCodecs.clear();
 
@@ -501,7 +501,7 @@ void QXmppRtpAudioChannel::payloadTypesChanged()
     }
 
     // create outgoing codec
-    foreach (const QXmppJinglePayloadType &outgoingType, m_outgoingPayloadTypes) {
+    Q_FOREACH (const QXmppJinglePayloadType &outgoingType, m_outgoingPayloadTypes) {
         // check for telephony events
         if (outgoingType.name() == "telephone-event") {
             d->outgoingTonesType = outgoingType;
@@ -634,7 +634,7 @@ void QXmppRtpAudioChannel::writeDatagram()
 #ifdef QXMPP_DEBUG_RTP
             logSent(packet.toString());
 #endif
-            emit sendDatagram(packet.encode());
+            Q_EMIT sendDatagram(packet.encode());
             d->outgoingSequence++;
             d->outgoingStamp += packetTicks;
 
@@ -675,7 +675,7 @@ void QXmppRtpAudioChannel::writeDatagram()
 #ifdef QXMPP_DEBUG_RTP
         logSent(packet.toString());
 #endif
-        emit sendDatagram(packet.encode());
+        Q_EMIT sendDatagram(packet.encode());
         d->outgoingSequence++;
         d->outgoingStamp += packetTicks;
     }
@@ -845,7 +845,7 @@ QXmppRtpVideoChannel::QXmppRtpVideoChannel(QObject *parent)
 
 QXmppRtpVideoChannel::~QXmppRtpVideoChannel()
 {
-    foreach (QXmppVideoDecoder *decoder, d->decoders)
+    Q_FOREACH (QXmppVideoDecoder *decoder, d->decoders)
         delete decoder;
     if (d->encoder)
         delete d->encoder;
@@ -921,10 +921,10 @@ QIODevice::OpenMode QXmppRtpVideoChannel::openMode() const
 void QXmppRtpVideoChannel::payloadTypesChanged()
 {
     // refresh decoders
-    foreach (QXmppVideoDecoder *decoder, d->decoders)
+    Q_FOREACH (QXmppVideoDecoder *decoder, d->decoders)
         delete decoder;
     d->decoders.clear();
-    foreach (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
+    Q_FOREACH (const QXmppJinglePayloadType &payload, m_incomingPayloadTypes) {
         QXmppVideoDecoder *decoder = 0;
         if (false)
             {}
@@ -947,7 +947,7 @@ void QXmppRtpVideoChannel::payloadTypesChanged()
         delete d->encoder;
         d->encoder = 0;
     }
-    foreach (const QXmppJinglePayloadType &payload, m_outgoingPayloadTypes) {
+    Q_FOREACH (const QXmppJinglePayloadType &payload, m_outgoingPayloadTypes) {
         QXmppVideoEncoder *encoder = 0;
         if (false)
             {}
@@ -992,14 +992,14 @@ void QXmppRtpVideoChannel::writeFrame(const QXmppVideoFrame &frame)
     packet.setMarker(false);
     packet.setType(d->outgoingId);
     packet.setSsrc(localSsrc());
-    foreach (const QByteArray &payload, d->encoder->handleFrame(frame)) {
+    Q_FOREACH (const QByteArray &payload, d->encoder->handleFrame(frame)) {
         packet.setSequence(d->outgoingSequence++);
         packet.setStamp(d->outgoingStamp);
         packet.setPayload(payload);
 #ifdef QXMPP_DEBUG_RTP
         logSent(packet.toString());
 #endif
-        emit sendDatagram(packet.encode());
+        Q_EMIT sendDatagram(packet.encode());
     }
     d->outgoingStamp += 1;
 }

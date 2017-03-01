@@ -614,13 +614,13 @@ void QXmppStanza::extensionsToXml(QXmlStreamWriter *xmlWriter) const
     if (!d->extendedAddresses.isEmpty()) {
         xmlWriter->writeStartElement("addresses");
         xmlWriter->writeAttribute("xmlns", ns_extended_addressing);
-        foreach (const QXmppExtendedAddress &address, d->extendedAddresses)
+        Q_FOREACH (const QXmppExtendedAddress &address, d->extendedAddresses)
             address.toXml(xmlWriter);
         xmlWriter->writeEndElement();
     }
 
     // other extensions
-    foreach (const QXmppElement &extension, d->extensions)
+    Q_FOREACH (const QXmppElement &extension, d->extensions)
         extension.toXml(xmlWriter);
 }
 

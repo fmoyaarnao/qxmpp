@@ -118,7 +118,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
         << ns_attention         // XEP-0224: Attention
         << ns_chat_markers;     // XEP-0333: Chat Markers
 
-    foreach(QXmppClientExtension* extension, client()->extensions())
+    Q_FOREACH(QXmppClientExtension* extension, client()->extensions())
     {
         if(extension)
             features << extension->discoveryFeatures();
@@ -135,7 +135,7 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     identity.setName(clientName());
     identities << identity;
 
-    foreach(QXmppClientExtension* extension, client()->extensions())
+    Q_FOREACH(QXmppClientExtension* extension, client()->extensions())
     {
         if(extension)
             identities << extension->discoveryIdentities();
@@ -279,9 +279,9 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
         case QXmppIq::Error:
             // handle all replies
             if (receivedIq.queryType() == QXmppDiscoveryIq::InfoQuery) {
-                emit infoReceived(receivedIq);
+                Q_EMIT infoReceived(receivedIq);
             } else if (receivedIq.queryType() == QXmppDiscoveryIq::ItemsQuery) {
-                emit itemsReceived(receivedIq);
+                Q_EMIT itemsReceived(receivedIq);
             }
             return true;
 

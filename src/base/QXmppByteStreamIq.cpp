@@ -162,7 +162,7 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     else if (m_mode == Udp)
         modeStr = "udp";
     helperToXmlAddAttribute(writer, "mode", modeStr);
-    foreach (const StreamHost& streamHost, m_streamHosts)
+    Q_FOREACH (const StreamHost& streamHost, m_streamHosts)
     {
         writer->writeStartElement("streamhost");
         helperToXmlAddAttribute(writer, "host", streamHost.host());

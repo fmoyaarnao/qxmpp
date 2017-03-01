@@ -328,7 +328,7 @@ void QXmppTransferJob::setLocalFileUrl(const QUrl &localFileUrl)
 {
     if (localFileUrl != d->localFileUrl) {
         d->localFileUrl = localFileUrl;
-        emit localFileUrlChanged(localFileUrl);
+        Q_EMIT localFileUrlChanged(localFileUrl);
     }
 }
 
@@ -406,16 +406,16 @@ void QXmppTransferJob::setState(QXmppTransferJob::State state)
         d->state = state;
         if (d->state == QXmppTransferJob::TransferState)
             d->transferStart.start();
-        emit stateChanged(d->state);
+        Q_EMIT stateChanged(d->state);
     }
 }
 
 void QXmppTransferJob::_q_terminated()
 {
-    emit stateChanged(d->state);
+    Q_EMIT stateChanged(d->state);
     if (d->error != NoError)
-        emit error(d->error);
-    emit finished();
+        Q_EMIT error(d->error);
+    Q_EMIT finished();
 }
 
 void QXmppTransferJob::terminate(QXmppTransferJob::Error cause)
@@ -719,7 +719,7 @@ void QXmppTransferOutgoingJob::_q_sendData()
         d->socksSocket->write(buffer, length);
         delete [] buffer;
         d->done += length;
-        emit progress(d->done, fileSize());
+        Q_EMIT progress(d->done, fileSize());
     }
 }
 /// \endcond
@@ -756,7 +756,7 @@ QXmppTransferManagerPrivate::QXmppTransferManagerPrivate(QXmppTransferManager *q
 
 QXmppTransferJob* QXmppTransferManagerPrivate::getJobByRequestId(QXmppTransferJob::Direction direction, const QString &jid, const QString &id)
 {
-    foreach (QXmppTransferJob *job, jobs)
+    Q_FOREACH (QXmppTransferJob *job, jobs)
         if (job->d->direction == direction &&
             job->d->jid == jid &&
             job->d->requestId == id)
@@ -771,7 +771,7 @@ QXmppTransferIncomingJob *QXmppTransferManagerPrivate::getIncomingJobByRequestId
 
 QXmppTransferIncomingJob* QXmppTransferManagerPrivate::getIncomingJobBySid(const QString &jid, const QString &sid)
 {
-    foreach (QXmppTransferJob *job, jobs)
+    Q_FOREACH (QXmppTransferJob *job, jobs)
         if (job->d->direction == QXmppTransferJob::IncomingDirection &&
             job->d->jid == jid &&
             job->d->sid == sid)
@@ -812,7 +812,7 @@ QXmppTransferManager::~QXmppTransferManager()
 void QXmppTransferManager::byteStreamIqReceived(const QXmppByteStreamIq &iq)
 {
     // handle IQ from proxy
-    foreach (QXmppTransferJob *job, d->jobs)
+    Q_FOREACH (QXmppTransferJob *job, d->jobs)
     {
         if (job->d->socksProxy.jid() == iq.from() && job->d->requestId == iq.id())
         {
@@ -1136,7 +1136,7 @@ void QXmppTransferManager::_q_iqReceived(const QXmppIq &iq)
     bool check;
     Q_UNUSED(check);
 
-    foreach (QXmppTransferJob *ptr, d->jobs)
+    Q_FOREACH (QXmppTransferJob *ptr, d->jobs)
     {
         // handle IQ from proxy
         if (ptr->direction() == QXmppTransferJob::OutgoingDirection && ptr->d->socksProxy.jid() == iq.from() && ptr->d->requestId == iq.id())
@@ -1219,7 +1219,7 @@ void QXmppTransferManager::_q_jobFinished()
     if (!job || !d->jobs.contains(job))
         return;
 
-    emit jobFinished(job);
+    Q_EMIT jobFinished(job);
 }
 
 void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
@@ -1281,7 +1281,7 @@ void QXmppTransferManager::_q_jobStateChanged(QXmppTransferJob::State state)
     client()->sendPacket(response);
 
     // notify user
-    emit jobStarted(job);
+    Q_EMIT jobStarted(job);
 }
 
 /// Sends the file at \a filePath to a remote party.
@@ -1417,7 +1417,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
     client()->sendPacket(request);
 
     // notify user
-    emit jobStarted(job);
+    Q_EMIT jobStarted(job);
 
     return job;
 }
@@ -1425,7 +1425,7 @@ QXmppTransferJob *QXmppTransferManager::sendFile(const QString &jid, QIODevice *
 void QXmppTransferManager::_q_socksServerConnected(QTcpSocket *socket, const QString &hostName, quint16 port)
 {
     const QString ownJid = client()->configuration().jid();
-    foreach (QXmppTransferJob *job, d->jobs)
+    Q_FOREACH (QXmppTransferJob *job, d->jobs)
     {
         if (hostName == streamHash(job->d->sid, ownJid, job->jid()) && port == 0)
         {
@@ -1444,7 +1444,7 @@ void QXmppTransferManager::socksServerSendOffer(QXmppTransferJob *job)
 
     // discover local IPs
     if (!d->proxyOnly) {
-        foreach (const QHostAddress &address, QXmppIceComponent::discoverAddresses()) {
+        Q_FOREACH (const QHostAddress &address, QXmppIceComponent::discoverAddresses()) {
             QXmppByteStreamIq::StreamHost streamHost;
             streamHost.setJid(ownJid);
             streamHost.setHost(address.toString());
@@ -1491,7 +1491,7 @@ void QXmppTransferManager::streamInitiationResultReceived(const QXmppStreamIniti
         job->state() != QXmppTransferJob::OfferState)
         return;
 
-    foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
+    Q_FOREACH (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
         if (field.key() == "stream-method") {
             if ((field.value().toString() == ns_ibb) &&
                 (d->supportedMethods & QXmppTransferJob::InBandMethod))
@@ -1578,10 +1578,10 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     job->d->sid = iq.siId();
     job->d->mimeType = iq.mimeType();
     job->d->fileInfo = iq.fileInfo();
-    foreach (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
+    Q_FOREACH (const QXmppDataForm::Field &field, iq.featureForm().fields()) {
         if (field.key() == "stream-method") {
             QPair<QString, QString> option;
-            foreach (option, field.options()) {
+            Q_FOREACH (option, field.options()) {
                 if (option.second == ns_ibb)
                     offeredMethods = offeredMethods | QXmppTransferJob::InBandMethod;
                 else if (option.second == ns_bytestreams)
@@ -1626,7 +1626,7 @@ void QXmppTransferManager::streamInitiationSetReceived(const QXmppStreamInitiati
     Q_ASSERT(check);
 
     // allow user to accept or decline the job
-    emit fileReceived(job);
+    Q_EMIT fileReceived(job);
 }
 
 /// Return the JID of the bytestream proxy to use for

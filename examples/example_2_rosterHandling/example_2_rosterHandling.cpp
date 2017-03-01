@@ -62,7 +62,7 @@ void xmppClient::clientConnected()
 void xmppClient::rosterReceived()
 {
     qDebug("example_2_rosterHandling:: Roster received");
-    foreach (const QString &bareJid, rosterManager().getRosterBareJids()) {
+    Q_FOREACH (const QString &bareJid, rosterManager().getRosterBareJids()) {
         QString name = rosterManager().getRosterEntry(bareJid).name();
         if(name.isEmpty())
             name = "-";

@@ -143,22 +143,22 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
 
             // store updated entries and notify changes
             const QList<QXmppRosterIq::Item> items = rosterIq.items();
-            foreach (const QXmppRosterIq::Item &item, items) {
+            Q_FOREACH (const QXmppRosterIq::Item &item, items) {
                 const QString bareJid = item.bareJid();
                 if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
                     if (d->entries.remove(bareJid)) {
                         // notify the user that the item was removed
-                        emit itemRemoved(bareJid);
+                        Q_EMIT itemRemoved(bareJid);
                     }
                 } else {
                     const bool added = !d->entries.contains(bareJid);
                     d->entries.insert(bareJid, item);
                     if (added) {
                         // notify the user that the item was added
-                        emit itemAdded(bareJid);
+                        Q_EMIT itemAdded(bareJid);
                     } else {
                         // notify the user that the item changed
-                        emit itemChanged(bareJid);
+                        Q_EMIT itemChanged(bareJid);
                     }
                 }
             }
@@ -167,14 +167,14 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
     case QXmppIq::Result:
         {
             const QList<QXmppRosterIq::Item> items = rosterIq.items();
-            foreach (const QXmppRosterIq::Item &item, items) {
+            Q_FOREACH (const QXmppRosterIq::Item &item, items) {
                 const QString bareJid = item.bareJid();
                 d->entries.insert(bareJid, item);
             }
             if (isInitial)
             {
                 d->isRosterReceived = true;
-                emit rosterReceived();
+                Q_EMIT rosterReceived();
             }
             break;
         }
@@ -199,11 +199,11 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence& presence)
     {
     case QXmppPresence::Available:
         d->presences[bareJid][resource] = presence;
-        emit presenceChanged(bareJid, resource);
+        Q_EMIT presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Unavailable:
         d->presences[bareJid].remove(resource);
-        emit presenceChanged(bareJid, resource);
+        Q_EMIT presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Subscribe:
         if (client()->configuration().autoAcceptSubscriptions())
@@ -214,7 +214,7 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence& presence)
             // ask for reciprocal subscription
             subscribe(bareJid);
         } else {
-            emit subscriptionReceived(bareJid);
+            Q_EMIT subscriptionReceived(bareJid);
         }
         break;
     default:

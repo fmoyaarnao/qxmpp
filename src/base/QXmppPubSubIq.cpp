@@ -243,7 +243,7 @@ void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     case QXmppPubSubIq::ItemsQuery:
     case QXmppPubSubIq::PublishQuery:
     case QXmppPubSubIq::RetractQuery:
-        foreach (const QXmppPubSubItem &item, m_items)
+        Q_FOREACH (const QXmppPubSubItem &item, m_items)
             item.toXml(writer);
         break;
     case QXmppPubSubIq::SubscriptionQuery:

@@ -234,7 +234,7 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
     QDataStream s(&payload, QIODevice::WriteOnly);
     if (d->type == Goodbye) {
         count = d->goodbyeSsrcs.size();
-        foreach (quint32 ssrc, d->goodbyeSsrcs)
+        Q_FOREACH (quint32 ssrc, d->goodbyeSsrcs)
             s << ssrc;
         if (!d->goodbyeReason.isEmpty()) {
             const QByteArray reason = d->goodbyeReason.toUtf8();
@@ -247,11 +247,11 @@ void QXmppRtcpPacket::write(QDataStream &stream) const
         s << d->ssrc;
         if (d->type == SenderReport)
             d->senderInfo.d->write(s);
-        foreach (const QXmppRtcpReceiverReport &report, d->receiverReports)
+        Q_FOREACH (const QXmppRtcpReceiverReport &report, d->receiverReports)
             report.d->write(s);
     } else if (d->type == SourceDescription) {
         count = d->sourceDescriptions.size();
-        foreach (const QXmppRtcpSourceDescription &desc, d->sourceDescriptions)
+        Q_FOREACH (const QXmppRtcpSourceDescription &desc, d->sourceDescriptions)
             desc.d->write(s);
     } else {
         count = d->count;

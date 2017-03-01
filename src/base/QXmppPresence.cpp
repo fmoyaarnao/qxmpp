@@ -312,7 +312,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeAttribute("xmlns", ns_muc_user);
         if (!d->mucItem.isNull())
             d->mucItem.toXml(xmlWriter);
-        foreach (int code, d->mucStatusCodes) {
+        Q_FOREACH (int code, d->mucStatusCodes) {
             xmlWriter->writeStartElement("status");
             xmlWriter->writeAttribute("code", QString::number(code));
             xmlWriter->writeEndElement();

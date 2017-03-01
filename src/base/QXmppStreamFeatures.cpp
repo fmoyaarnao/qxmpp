@@ -170,7 +170,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     {
         writer->writeStartElement("compression");
         writer->writeAttribute("xmlns", ns_compressFeature);
-        foreach (const QString &method, m_compressionMethods)
+        Q_FOREACH (const QString &method, m_compressionMethods)
             writer->writeTextElement("method", method);
         writer->writeEndElement();
     }
@@ -178,7 +178,7 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     {
         writer->writeStartElement("mechanisms");
         writer->writeAttribute("xmlns", ns_sasl);
-        foreach (const QString &mechanism, m_authMechanisms)
+        Q_FOREACH (const QString &mechanism, m_authMechanisms)
             writer->writeTextElement("mechanism",  mechanism);
         writer->writeEndElement();
     }

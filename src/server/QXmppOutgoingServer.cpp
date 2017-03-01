@@ -150,7 +150,7 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
 void QXmppOutgoingServer::_q_socketDisconnected()
 {
     debug("Socket disconnected");
-    emit disconnected();
+    Q_EMIT disconnected();
 }
 
 /// \cond
@@ -239,17 +239,17 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
                 d->ready = true;
 
                 // send queued data
-                foreach (const QByteArray &data, d->dataQueue)
+                Q_FOREACH (const QByteArray &data, d->dataQueue)
                     sendData(data);
                 d->dataQueue.clear();
 
                 // emit signal
-                emit connected();
+                Q_EMIT connected();
             }
         }
         else if (response.command() == QXmppDialback::Verify)
         {
-            emit dialbackResponseReceived(response);
+            Q_EMIT dialbackResponseReceived(response);
         }
 
     }
@@ -348,6 +348,6 @@ void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
 void QXmppOutgoingServer::socketError(QAbstractSocket::SocketError error)
 {
     Q_UNUSED(error);
-    emit disconnected();
+    Q_EMIT disconnected();
 }
 
