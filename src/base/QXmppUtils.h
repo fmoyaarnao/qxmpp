@@ -64,9 +64,16 @@ public:
     static QString generateStanzaHash(int length=32);
 };
 
+#ifdef Q_OS_WIN
+void QXMPP_EXPORT helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
+                             const QString& value);
+void QXMPP_EXPORT helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
+                           const QString& value);
+#else
 void helperToXmlAddAttribute(QXmlStreamWriter* stream, const QString& name,
                              const QString& value);
 void helperToXmlAddTextElement(QXmlStreamWriter* stream, const QString& name,
                            const QString& value);
+#endif
 
 #endif // QXMPPUTILS_H
