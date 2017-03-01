@@ -1,6 +1,6 @@
 include(qxmpp.pri)
 
-CONFIG += ordered no_keywords
+CONFIG += ordered
 TEMPLATE = subdirs
 
 SUBDIRS = src
