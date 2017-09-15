@@ -94,7 +94,7 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
     , saslAuthMechanism("DIGEST-MD5")
-    , connectTimeout(10)
+    , connectTimeout(15)
 {
 }
 
@@ -594,10 +594,21 @@ void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate> &caCerti
     d->caCertificates = caCertificates;
 }
 
+/// Returns the connection timeout in seconds.
+///
+/// The default value is 15 seconds.
+
 int QXmppConfiguration::connectTimeout() const
 {
     return d->connectTimeout;
 }
+
+/// Specifies the maximum time in seconds to wait for a connect
+/// to the server before considering we can not connect.
+///
+/// If set to zero no timeout will occur.
+///
+/// The default value is 15 seconds.
 
 void QXmppConfiguration::setConnectTimeout(int secs)
 {
