@@ -74,6 +74,9 @@ public:
     QNetworkProxy networkProxy;
 
     QList<QSslCertificate> caCertificates;
+
+    // conenction timeout in seconds, if zero won't timeout
+    int connectTimeout;
 };
 
 QXmppConfigurationPrivate::QXmppConfigurationPrivate()
@@ -91,6 +94,7 @@ QXmppConfigurationPrivate::QXmppConfigurationPrivate()
     , streamSecurityMode(QXmppConfiguration::TLSEnabled)
     , nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
     , saslAuthMechanism("DIGEST-MD5")
+    , connectTimeout(10)
 {
 }
 
@@ -588,6 +592,16 @@ int QXmppConfiguration::keepAliveTimeout() const
 void QXmppConfiguration::setCaCertificates(const QList<QSslCertificate> &caCertificates)
 {
     d->caCertificates = caCertificates;
+}
+
+int QXmppConfiguration::connectTimeout() const
+{
+    return d->connectTimeout;
+}
+
+void QXmppConfiguration::setConnectTimeout(int secs)
+{
+    d->connectTimeout = secs;
 }
 
 /// Returns the a list of trusted CA certificates.
