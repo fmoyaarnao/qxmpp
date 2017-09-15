@@ -30,6 +30,8 @@
 #include "QXmppStanza.h"
 #include "QXmppStream.h"
 
+#include <QRunnable>
+
 class QDomElement;
 class QSslError;
 
@@ -93,6 +95,7 @@ private Q_SLOTS:
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError>&);
+    void connectTimeout(bool connected);
 
     void pingStart();
     void pingStop();
@@ -105,6 +108,24 @@ private:
 
     friend class QXmppOutgoingClientPrivate;
     QXmppOutgoingClientPrivate * const d;
+};
+
+class QXMPP_EXPORT QXmppConnectTimeoutTask : public QObject, public QRunnable {
+    Q_OBJECT
+
+public:
+    QXmppConnectTimeoutTask(QAbstractSocket * socket, int secs);
+    ~QXmppConnectTimeoutTask();
+
+protected:
+    void run() override;
+
+Q_SIGNALS:
+    void done(bool connected);
+
+private:
+    QAbstractSocket * m_socket;
+    int m_timeout;
 };
 
 #endif // QXMPPOUTGOINGCLIENT_H

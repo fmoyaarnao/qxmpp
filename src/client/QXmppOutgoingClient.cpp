@@ -57,6 +57,7 @@
 #include <QHostAddress>
 #include <QXmlStreamWriter>
 #include <QTimer>
+#include <QThreadPool>
 
 class QXmppOutgoingClientPrivate
 {
@@ -138,6 +139,17 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
         q->socket()->connectToHostEncrypted(host, port);
     } else {
         q->socket()->connectToHost(host, port);
+    }
+
+    // If we have a connect timeout we launch a new Task
+    // in a new thread to manage the connection timeout
+    if (config.connectTimeout() > 0) {
+        QXmppConnectTimeoutTask * task = new QXmppConnectTimeoutTask(q->socket(),
+                                                                     config.connectTimeout());
+        task->setAutoDelete(true);
+        QObject::connect(task, &QXmppConnectTimeoutTask::done,
+                         q, &QXmppOutgoingClient::connectTimeout);
+        QThreadPool::globalInstance()->start(task);
     }
 }
 
@@ -282,6 +294,17 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
     // if configured, ignore the errors
     if (configuration().ignoreSslErrors())
         socket()->ignoreSslErrors();
+}
+
+void QXmppOutgoingClient::connectTimeout(bool connected)
+{
+    if (connected
+            || socket()->state() == QAbstractSocket::UnconnectedState
+            || socket()->state() == QAbstractSocket::ClosingState)
+        return;
+
+    disconnectFromHost();
+    Q_EMIT error(QXmppClient::SocketError);
 }
 
 void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
@@ -772,6 +795,53 @@ void QXmppOutgoingClient::sendNonSASLAuthQuery()
     // not attempt to guess the required fields?
     authQuery.setUsername(configuration().user());
     sendPacket(authQuery);
+}
+
+QXmppConnectTimeoutTask::QXmppConnectTimeoutTask(QAbstractSocket * socket,
+                                                 int secs)
+    : m_socket(socket)
+    , m_timeout(secs * 1000) {
+}
+
+QXmppConnectTimeoutTask::~QXmppConnectTimeoutTask() {
+    m_socket = nullptr;
+    m_timeout = 0;
+}
+
+void QXmppConnectTimeoutTask::run() {
+    if (m_socket == nullptr) {
+        Q_EMIT done(false);
+        return;
+    }
+
+    // http://doc.qt.io/qt-5/qabstractsocket.html#waitForConnected
+    // Note: This function may fail randomly on Windows.
+    // Consider using the event loop and the connected() signal
+    // if your software will run on Windows.
+#ifdef Q_OS_WIN
+    QEventLoop loop;
+
+    QTimer timer;
+    timer.setSingleShot(true);
+
+    QObject::connect(&timer, &QTimer::timeout,
+                     &loop, &QEventLoop::quit);
+    QObject::connect(m_socket, &QAbstractSocket::connected,
+                     &loop, &QEventLoop::quit);
+
+    timer.start(m_timeout);
+    loop.exec();
+
+    if (timer.isActive()) {
+        timer.stop();
+        Q_EMIT done(true);
+    } else {
+        Q_EMIT done(false);
+    }
+#else
+    Q_EMIT done(m_socket->waitForConnected(m_timeout));
+#endif
+
 }
 
 /// Returns the type of the last XMPP stream error that occured.

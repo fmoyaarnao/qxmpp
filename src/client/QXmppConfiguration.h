@@ -150,6 +150,9 @@ public:
     QList<QSslCertificate> caCertificates() const;
     void setCaCertificates(const QList<QSslCertificate> &);
 
+    int connectTimeout() const;
+    void setConnectTimeout(int secs);
+
 private:
     QSharedDataPointer<QXmppConfigurationPrivate> d;
 };
