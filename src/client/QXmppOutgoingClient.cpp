@@ -818,7 +818,6 @@ void QXmppConnectTimeoutTask::run() {
     // Note: This function may fail randomly on Windows.
     // Consider using the event loop and the connected() signal
     // if your software will run on Windows.
-#ifdef Q_OS_WIN
     QEventLoop loop;
 
     QTimer timer;
@@ -838,9 +837,6 @@ void QXmppConnectTimeoutTask::run() {
     } else {
         Q_EMIT done(false);
     }
-#else
-    Q_EMIT done(m_socket->waitForConnected(m_timeout));
-#endif
 
 }
 
