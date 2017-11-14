@@ -354,6 +354,16 @@ void QXmppClient::sendMessage(const QString& bareJid, const QString& message)
     }
 }
 
+void QXmppClient::abort()
+{
+    // cancel reconnection
+    d->reconnectionTimer->stop();
+
+    d->clientPresence.setType(QXmppPresence::Unavailable);
+    d->clientPresence.setStatusText("Logged out");
+    d->stream->socket()->abort();
+}
+
 /// Returns the client's current state.
 
 QXmppClient::State QXmppClient::state() const

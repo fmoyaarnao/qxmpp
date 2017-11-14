@@ -227,6 +227,7 @@ public Q_SLOTS:
     virtual void disconnectFromServer();
     virtual bool sendPacket(const QXmppStanza&);
     virtual void sendMessage(const QString& bareJid, const QString& message);
+    virtual void abort();
 
 private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);
