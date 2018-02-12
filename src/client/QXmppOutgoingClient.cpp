@@ -121,8 +121,10 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     if (!config.caCertificates().isEmpty())
         q->socket()->setCaCertificates(config.caCertificates());
 
+#ifndef Q_OS_WINRT
     // respect proxy
     q->socket()->setProxy(config.networkProxy());
+#endif
 
 #if (QT_VERSION >= QT_VERSION_CHECK(4, 8, 0))
     // set the name the SSL certificate should match

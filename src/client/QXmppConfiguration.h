@@ -138,8 +138,10 @@ public:
     QString saslAuthMechanism() const;
     void setSaslAuthMechanism(const QString &mechanism);
 
+#ifndef Q_OS_WINRT
     QNetworkProxy networkProxy() const;
     void setNetworkProxy(const QNetworkProxy& proxy);
+#endif
 
     int keepAliveInterval() const;
     void setKeepAliveInterval(int secs);

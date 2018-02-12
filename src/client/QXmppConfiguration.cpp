@@ -71,7 +71,9 @@ public:
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism;
     QString saslAuthMechanism;
 
+#ifndef Q_OS_WINRT
     QNetworkProxy networkProxy;
+#endif
 
     QList<QSslCertificate> caCertificates;
 
@@ -522,6 +524,7 @@ void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
     d->saslAuthMechanism = mechanism;
 }
 
+#ifndef Q_OS_WINRT
 /// Specifies the network proxy used for the connection made by QXmppClient.
 /// The default value is QNetworkProxy::DefaultProxy that is the proxy is
 /// determined based on the application proxy set using
@@ -543,6 +546,7 @@ QNetworkProxy QXmppConfiguration::networkProxy() const
 {
     return d->networkProxy;
 }
+#endif
 
 /// Specifies the interval in seconds at which keep alive (ping) packets
 /// will be sent to the server.
